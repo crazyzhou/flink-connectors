@@ -223,7 +223,7 @@ public final class ConnectorConfigurations {
         if (defaultScope.isPresent()) {
             pravegaConfig.withDefaultScope(defaultScope.get());
         }
-        if (authType.isPresent() && authToken.isPresent()) {
+        if (authType.isPresent() && authType.get().equals("Basic") && authToken.isPresent()) {
             pravegaConfig.withCredentials(new SimpleCredentials(authType.get(), authToken.get()));
         }
         if (validateHostName.isPresent()) {
