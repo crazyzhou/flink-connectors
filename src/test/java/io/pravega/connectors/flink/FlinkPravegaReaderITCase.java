@@ -38,6 +38,8 @@ import org.junit.rules.Timeout;
 
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.Assert.fail;
+
 /**
  * Integration tests for {@link FlinkPravegaReader}.
  */
@@ -67,11 +69,13 @@ public class FlinkPravegaReaderITCase extends AbstractTestBase {
     @Test
     public void testOneSourceOneSegment() throws Exception {
         runTest(1, 1, NUM_STREAM_ELEMENTS);
+        checkProducerLeak();
     }
 
     @Test
     public void testOneSourceMultipleSegments() throws Exception {
         runTest(1, 4, NUM_STREAM_ELEMENTS);
+        checkProducerLeak();
     }
 
     // this test currently does ot work, see https://github.com/pravega/pravega/issues/1152
@@ -83,6 +87,7 @@ public class FlinkPravegaReaderITCase extends AbstractTestBase {
     @Test
     public void testMultipleSourcesMultipleSegments() throws Exception {
         runTest(4, 4, NUM_STREAM_ELEMENTS);
+        checkProducerLeak();
     }
 
     @Test
@@ -248,6 +253,14 @@ public class FlinkPravegaReaderITCase extends AbstractTestBase {
 
             final long executeEnd = System.nanoTime();
             System.out.println(String.format("Test execution took %d ms", (executeEnd - executeStart) / 1_000_000));
+        }
+    }
+
+    private void checkProducerLeak() {
+        for (Thread t : Thread.getAllStackTraces().keySet()) {
+            if (t.getName().contains("clientInternal")) {
+                fail("Detected producer leak. Thread name: " + t.getName());
+            }
         }
     }
 }
