@@ -360,6 +360,9 @@ public class FlinkPravegaReader<T>
 
     @Override
     public void close() throws Exception {
+
+        Thread.sleep(10000);
+
         if (eventStreamClientFactory != null) {
             log.info("Closing Pravega eventStreamClientFactory");
             eventStreamClientFactory.close();
